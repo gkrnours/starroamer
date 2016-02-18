@@ -1,0 +1,10 @@
+#!/bin/sh
+# starroamer daemon script for OpenBSD 5.8
+
+daemon="/home/gkr/work/web/starroamer/nv/bin/python2.7 /home/gkr/work/web/starroamer/fcgi.py"
+
+. /etc/rc.d/rc.subr
+
+rc_bg="YES"
+
+rc_cmd $1

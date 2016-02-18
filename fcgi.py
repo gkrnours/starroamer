@@ -1,5 +1,14 @@
 #!/usr/bin/env python
+import os
 from flup.server.fcgi import WSGIServer
-from server import app
+import server
 
-WSGIServer(app, bindAddress="/var/www/run/starroamer.sock").run()
+wsgi = WSGIServer(server.app,
+    bindAddress="/var/www/run/starroamer.sock", umask=0002)
+
+print("running as process %s" % os.getpid())
+
+while wsgi.run():
+    reload(server)
+    wsgi.application = server.app
+    print("application reloaded")
