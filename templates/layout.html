@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<meta http-equiv=x-ua-compatible content=ie=edge>
+
+<link rel=stylesheet
+	href="{{ url_for('static', filename='css/bootstrap.css') }}">
+
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+	<h1 class="navbar-brand m-a-0 p-a-0">
+		<a class="navbar-brand" style="line-height: 32px" href="/">
+			<img alt=freighter_icon class="pull-xs-left p-r-1"
+				src="{{ url_for("static", filename="img/freighter.png") }}">
+			Star Roamer
+		</a>
+	</h1>
+	<menu class="nav navbar-nav m-t-0">
+		<li class="nav-item">
+			<a class="nav-link " href="">Test</a>
+		<li class="nav-item pull-xs-right">
+			<a class="nav-link" style="padding: 5px 0"
+				href="">
+				<img alt="EVE SSO" src="{{ url_for("static",
+					filename="img/EVE_SSO_Login_Buttons_Small_Black.png") }}">
+			</a>
+	</menu>
+</nav>
+
+<header class="jumbotron jumbotron-fluid m-t-3 m-b-0">
+</header>
+
+<main style="min-height: 100vh; background: #111">
+	{% block main %}&nbsp;{% endblock %}
+</main>

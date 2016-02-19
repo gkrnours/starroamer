@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+
 from flask import Flask
+from utils import templated
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', endpoint="index")
+@templated()
 def hello():
-    return "Hello!"
+    print("ping")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", debug=True)
