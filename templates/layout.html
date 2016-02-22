@@ -6,6 +6,16 @@
 <link rel=stylesheet
 	href="{{ url_for('static', filename='css/bootstrap.css') }}">
 
+<style>
+	body > .jumbotron {
+		background: url("{{ url_for('static',
+			filename='img/fenrir_by_callmeroth.png') }}")
+			no-repeat center center;
+		background-size: 100vw auto;
+		height: 20vw;
+	}
+</style>
+
 <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
 	<h1 class="navbar-brand m-a-0 p-a-0">
 		<a class="navbar-brand" style="line-height: 32px" href="/">
