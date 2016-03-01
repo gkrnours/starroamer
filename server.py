@@ -5,9 +5,10 @@ import json
 from flask import Flask
 from flask import redirect, url_for, session
 from flask import request as req
-from oauth2client.client import OAuth2WebServerFlow
+from oauth2client import client
 import httplib2
 
+from user import User
 from utils import templated, SessionCredStorage
 
 app = Flask(__name__)
@@ -16,13 +17,14 @@ app.secret_key = 'DEV_SECRET_KEY'
 
 ROOT_URL = "https://crest-tq.eveonline.com"
 
-oa2flow = OAuth2WebServerFlow(
+client.REFRESH_STATUS_CODES = (400,)
+oa2flow = client.OAuth2WebServerFlow(
     client_id = "350c3b990af74ce58c2713e6e8a95c2c",
     client_secret = "3e4rOgOsLjnrn5KfgkBZQ6l9UnI7uBfbqHRGjGOz",
     auth_uri = "https://login.eveonline.com/oauth/authorize",
     token_uri = "https://login.eveonline.com/oauth/token",
     redirect_uri = "https://starroamer.mattic.org/auth",
-    scope="",
+    scope="characterFittingsRead",
 )
 
 @app.route('/', endpoint="index")
@@ -46,6 +48,31 @@ def api():
         json.dumps(json.loads(content), indent=4)
     )
 
+@app.route('/cred')
+def cred():
+    cred = SessionCredStorage().get()
+    return "<pre>%s</pre>" % (
+        json.dumps(json.loads(cred.to_json()), indent=4)
+    )
+
+@app.route('/verify')
+def verify():
+    cred = SessionCredStorage().get()
+    path = "https://login.eveonline.com/oauth/verify"
+    http = httplib2.Http()
+    http = cred.authorize(http)
+    (header, content) = http.request("%s" % (path), "GET")
+    data = json.loads(content)
+    print(data.get("CharacterName", "Unknown"))
+    return "<pre>%s<hr>%s" % (
+        json.dumps(header, indent=4),
+        json.dumps(json.loads(content), indent=4)
+    )
+
+@app.route('/refresh')
+def refresh():
+    pass
+
 @app.route('/auth/go', endpoint="auth.start")
 def auth_start():
     return redirect(oa2flow.step1_get_authorize_url())
@@ -54,7 +81,17 @@ def auth_start():
 def auth_back():
     code = req.args.get('code')
     SessionCredStorage().put(oa2flow.step2_exchange(code))
+    # Grabbing and storing user identity
+    cred = SessionCredStorage().get()
+    path = "https://login.eveonline.com/oauth/verify"
+    http = httplib2.Http()
+    http = cred.authorize(http)
+    (header, content) = http.request("%s" % (path), "GET")
+    session['user'] = User.from_json(content)
+    # Back home
     return redirect(url_for("index"))
+
+"""select (select solarSystemName from mapSolarSystems where solarSystemID = (select solarSystemID from mapDenormalize where itemID = (select destinationID from mapJumps where stargateID = map.itemID))), solarSystemID, x, y, z from mapDenormalize as map where groupID = 10 and solarSystemID = 30002543;"""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
