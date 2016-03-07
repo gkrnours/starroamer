@@ -20,6 +20,112 @@ Summary
  * mapSolarSystemJumps
  * mapSolarSystems
 
+mapCelestialStatistics
+----------------------
+
+### Structure
+
+ * celestialID | int | indexed
+ * temperature | real |
+ * spectralClass | str(10) |
+ * luminosity | real |
+ * age | real |
+ * life | real |
+ * orbitRadius | real |
+ * eccentricity | real |
+ * massDust | real |
+ * massGas | real |
+ * fragmented | int |
+ * density | real |
+ * surfaceGravity | real |
+ * escapeVelocity | real |
+ * orbitPeriod | real |
+ * rotationRate | real |
+ * locked | int |
+ * pressure | int |
+ * radius | int |
+ * mass | int |
+
+### Interpretation
+
+Data about the suns in the eveonline universe.
+
+mapConstellationJumps
+---------------------
+
+### Structure
+
+ * fromRegionID | int |
+ * fromConstellationID | int |
+ * toConstellationID | int |
+ * toRegionID | int |
+ * INDEX (fromConstellationID, toConstellationID)
+
+### Interpretation
+
+List of stargate between different constellations.
+
+mapConstellations
+-----------------
+
+### Structure
+
+ * regionID | int | indexed
+ * constellationID | int | indexed
+ * constellationName | str(100) |
+ * x | real |
+ * y | real |
+ * z | real |
+ * xMin | real |
+ * xMax | real |
+ * yMin | real |
+ * yMax | real |
+ * zMin | real |
+ * zMax | real |
+ * factionID | int |
+ * radius | real |
+
+### Interpretation
+
+Describe the different constellation
+
+mapDenormalize
+--------------
+
+### Structure
+
+ * itemID | int | indexed
+ * typeID | int |
+ * groupID | int |
+ * solarSystemID | int | indexed
+ * constellationID | int | indexed
+ * regionID | int | indexed
+ * orbitID | int | indexed
+ * x | real |
+ * y | real |
+ * z | real |
+ * radius | real |
+ * itemName | str(100) |
+ * [security] | real |
+ * celestialIndex | int |
+ * orbitIndex | int |
+ * INDEX (groupID, regionID)
+ * INDEX (groupID, constellationID)
+ * INDEX (groupID, solarSystemID)
+
+### Interpretation
+
+Give list of object in space, with index for search by region,
+constellation and system.
+
+mapJumps
+--------
+
+### Structure
+
+ * stargateID | int | indexed
+ * destinationID | int |
+
 mapSolarSystems
 ---------------
 
