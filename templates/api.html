@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block main %}
+	<div class=row>
+		<div class=col-md-3 id=annu>
+		</div>
+		<form class=col-md-9>
+			<h3>API Console</h3>
+			<fieldset class=form-group>
+				<label for=path>Path</label>
+				<input type=text class=form-control id=path name=path>
+			</fieldset>
+			<button type=submit class="btn btn-outline-primary">Submit</button>
+
+			<hr>
+
+			<pre id=output>
+			</pre>
+		</form>
+	</div>
+{% endblock %}
+
+{% block script %}
+<script>
+	URL_PREFIX = "https://crest-tq.eveonline.com"
+
+	$(document).ready(function() {
+		$(document.forms[0]).on('submit', function(evt) {
+			evt.preventDefault();
+			data = $(evt.target).serializeArray()[0]
+			$.ajax('/api/get', {data: {path: data['value']}})
+			.done(function(rep, ok) {
+				console.log(rep)
+				if(ok) {
+					if (300 <= rep['header'].status) {
+						printError(rep['header'], rep['data'])
+					}
+					else {
+						printApiResponse(rep['header'], rep['data'])
+					}
+				}
+			})
+		})
+
+		buildAnnu()
+		$("#annu").on("click", function(evt) {
+			$("[name='path']").val($(evt.target).attr("data-href"))
+		})
+	})
+
+	/*
+	 *
+	 *
+	 */
+
+	function buildAnnu() {
+		$("#annu").html("")
+		lists = {}
+		for (i=0; i<localStorage.length; ++i) {
+			key = localStorage.key(i)
+			try {
+				data = JSON.parse(localStorage.getItem(key))
+			} catch(e) {
+				console.log(localStorage.getItem(key))
+				console.error(e)
+				continue
+			}
+			if (!lists.hasOwnProperty(data.parent))
+				lists[data.parent] = $("<ul>").addClass("list-group")
+			item = $("<li>")
+				.text(key)
+				.addClass("list-group-item")
+				.attr("data-href", data.url)
+			lists[data.parent].append(item)
+		}
+		for (att in lists) {
+			$("#annu")
+				.append($("<h3>").text(att))
+				.append(lists[att])
+		}
+	}
+
+	function printHeader(header, full) {
+		full = full || false
+		var head = $("<ul id=api_header>")
+		if (full) {
+			to_display = [
+				"x-deprecated",
+				"x-deprecated",
+				"status", "date", "content-type",
+				"cache-control", "x-cache-status"
+			]
+		} else {
+			to_display = ["x-deprecated", "status", "date", "content-type"]
+		}
+		for (i=0; i<to_display.length; ++i) {
+			att = to_display[i]
+			head.append($("<li>")
+					.append($("<strong>").text(att))
+					.append(header[att])
+				)
+		}
+		$("#output")
+			.append($("<h3>").text('Header'))
+			.append(head)
+	}
+
+	function printLink(content) {
+		list = $("<ul>")
+		parent = $("[name='path']").val()
+		for (att in content) {
+			obj = content[att]
+			if (typeof(obj) == "string")
+				continue
+			if (obj.hasOwnProperty("href")
+				&& obj["href"].indexOf(URL_PREFIX) == 0) {
+				api_point = obj["href"].substr(URL_PREFIX.length)
+				localStorage.setItem(att, JSON.stringify({
+					url:api_point,
+					parent: parent
+				}))
+				delete content[att]
+				list.append($("<li>").text(att))
+			}
+		}
+		buildAnnu()
+		if (list.children().length) {
+			$("#output")
+				.append($("<h3>").text('API Endpoint'))
+				.append(list)
+		}
+	}
+
+	function printError(header, content) {
+		$("#output").html("")
+		printHeader(header)
+			.append($("<h3>").text(content.key))
+			.append($("<p>").text(content.message))
+	}
+
+	function printApiResponse(header, content) {
+		$("#output").html("")
+		printHeader(header, true)
+		printLink(content)
+
+		cont = $("<ul>")
+		for (att in content) {
+			item = $('<li>')
+			item.append(att)
+			inner = $("<ul>")
+			for (at in content[att]) {
+				line = $("<li>")
+				if (typeof(content[att][at] == "object"))
+					line.text(at+": "+JSON.stringify(content[att][at]))
+				else
+					line.text(at+": "+(data[att][at]))
+				inner.append(line)
+			}
+			item.append(inner)
+			cont.append(item)
+		}
+		$("#output").append($("<h3>").text('Content'))
+		$("#output").append(cont)
+	}
+</script>
+{% endblock %}

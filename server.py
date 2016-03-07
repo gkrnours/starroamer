@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import json
+import pickle
 
 from flask import Flask
-from flask import redirect, url_for, session
+from flask import abort, jsonify, redirect, session, url_for
 from flask import request as req
 from oauth2client import client
 import httplib2
@@ -24,12 +25,14 @@ oa2flow = client.OAuth2WebServerFlow(
     auth_uri = "https://login.eveonline.com/oauth/authorize",
     token_uri = "https://login.eveonline.com/oauth/token",
     redirect_uri = "https://starroamer.mattic.org/auth",
-    scope="characterFittingsRead",
+    scope="publicData characterFittingsRead characterLocationRead",
 )
 
 @app.route('/', endpoint="index")
 @templated()
 def hello():
+    user = pickle.loads(session.get('user'))
+    return {'user': user}
     try:
         cred = SessionCredStorage().get()
         return {"auth": "ok"}
@@ -37,12 +40,20 @@ def hello():
         pass
 
 @app.route('/api')
+@templated()
 def api():
+    pass
+
+@app.route('/api/get')
+def api_get():
     cred = SessionCredStorage().get()
     path = req.args.get('path')
+    if not path:
+        return abort(400)
     http = httplib2.Http()
     http = cred.authorize(http)
     (header, content) = http.request("%s%s" % (ROOT_URL, path), "GET")
+    return jsonify(header=header, data=json.loads(content))
     return "<pre>%s<hr>%s" % (
         json.dumps(header, indent=4),
         json.dumps(json.loads(content), indent=4)
@@ -87,11 +98,10 @@ def auth_back():
     http = httplib2.Http()
     http = cred.authorize(http)
     (header, content) = http.request("%s" % (path), "GET")
-    session['user'] = User.from_json(content)
+    session['user'] = pickle.dumps(User.from_json(content))
     # Back home
     return redirect(url_for("index"))
 
-"""select (select solarSystemName from mapSolarSystems where solarSystemID = (select solarSystemID from mapDenormalize where itemID = (select destinationID from mapJumps where stargateID = map.itemID))), solarSystemID, x, y, z from mapDenormalize as map where groupID = 10 and solarSystemID = 30002543;"""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

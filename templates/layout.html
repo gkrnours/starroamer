@@ -2,17 +2,36 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width, initial-scale=1">
 <meta http-equiv=x-ua-compatible content=ie=edge>
+<title>Star Roamer{% if title %}: {{ title }}{% endif %}</title>
 
 <link rel=stylesheet
 	href="{{ url_for('static', filename='css/bootstrap.css') }}">
 
+<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+{% block script %}{% endblock %}
+
 <style>
+	body {
+		background-color: #111;
+	}
 	body > .jumbotron {
 		background: url("{{ url_for('static',
 			filename='img/fenrir_by_callmeroth.png') }}")
 			no-repeat center center;
 		background-size: 100vw auto;
 		height: 20vw;
+	}
+	#api_header strong {
+		display: inline-block;
+		width: 150px;
+		overflow: hidden;
+	}
+	#annu h3 {
+		overflow: hidden;
+	}
+	#annu .list-group-item:hover {
+		cursor: pointer;
+		background: #ddd;
 	}
 </style>
 
@@ -39,6 +58,6 @@
 <header class="jumbotron jumbotron-fluid m-t-3 m-b-0">
 </header>
 
-<main style="min-height: 100vh; background: #111">
+<main class="container p-t-1">
 	{% block main %}&nbsp;{% endblock %}
 </main>

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block main %}
-	{% if auth %}
-		{{ auth }}
+	{% if user %}
+		{{ user.name }}
 	{% endif %}
 {% endblock %}
