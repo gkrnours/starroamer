@@ -2,13 +2,16 @@
 
 import json
 import pickle
+import sqlite3
 
 from flask import Flask
 from flask import abort, jsonify, redirect, session, url_for
 from flask import request as req
 from oauth2client import client
 import httplib2
+import networkx as nx
 
+import data
 from user import User
 from utils import templated, SessionCredStorage
 
@@ -18,15 +21,25 @@ app.secret_key = 'DEV_SECRET_KEY'
 
 ROOT_URL = "https://crest-tq.eveonline.com"
 
+
 client.REFRESH_STATUS_CODES = (400,)
 oa2flow = client.OAuth2WebServerFlow(
-    client_id = "350c3b990af74ce58c2713e6e8a95c2c",
-    client_secret = "3e4rOgOsLjnrn5KfgkBZQ6l9UnI7uBfbqHRGjGOz",
-    auth_uri = "https://login.eveonline.com/oauth/authorize",
-    token_uri = "https://login.eveonline.com/oauth/token",
-    redirect_uri = "https://starroamer.mattic.org/auth",
     scope="publicData characterFittingsRead characterLocationRead",
+    client_id = data.client_id,
+    client_secret = data.client_secret,
+    **data.server
 )
+
+db  = sqlite3.connect("starroamer.db")
+cur = db.cursor()
+universe = nx.DiGraph()
+jumps = cur.execute("""
+    SELECT fromID, destID, destName, distance
+    FROM jump
+""")
+for A, B, name, dist in jumps:
+    universe.add_edge(A, B, name=name, dist=dist)
+db.close()
 
 @app.route('/', endpoint="index")
 @templated()
@@ -38,6 +51,17 @@ def hello():
         return {"auth": "ok"}
     except TypeError:
         pass
+
+@app.route('/sys/system')
+def system():
+    db  = sqlite3.connect("starroamer.db")
+    cur = db.cursor()
+    data = cur.execute("""
+        SELECT itemID, name, systemID, system
+        FROM station
+    """).fetchall()
+    db.close()
+    return jsonify(data=data)
 
 @app.route('/api')
 @templated()
@@ -54,10 +78,6 @@ def api_get():
     http = cred.authorize(http)
     (header, content) = http.request("%s%s" % (ROOT_URL, path), "GET")
     return jsonify(header=header, data=json.loads(content))
-    return "<pre>%s<hr>%s" % (
-        json.dumps(header, indent=4),
-        json.dumps(json.loads(content), indent=4)
-    )
 
 @app.route('/cred')
 def cred():
@@ -101,6 +121,11 @@ def auth_back():
     session['user'] = pickle.dumps(User.from_json(content))
     # Back home
     return redirect(url_for("index"))
+
+@app.route('/plan')
+@templated()
+def plan():
+    pass
 
 
 if __name__ == "__main__":
