@@ -11,7 +11,7 @@ from oauth2client import client
 import httplib2
 import networkx as nx
 
-import data
+from data import tranquility as data
 from user import User
 from utils import templated, SessionCredStorage
 
@@ -25,9 +25,9 @@ ROOT_URL = "https://crest-tq.eveonline.com"
 client.REFRESH_STATUS_CODES = (400,)
 oa2flow = client.OAuth2WebServerFlow(
     scope="publicData characterFittingsRead characterLocationRead",
-    client_id = data.client_id,
-    client_secret = data.client_secret,
-    **data.server
+    client_id = data['auth']['client_id'],
+    client_secret = data['auth']['client_secret'],
+    **data['client']
 )
 
 db  = sqlite3.connect("starroamer.db")
