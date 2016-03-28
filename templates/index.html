@@ -2,6 +2,8 @@
 
 {% block main %}
 	{% if user %}
-		{{ user.name }}
+		{% include "user/index.html" %}
+	{% else %}
+		{% include "landing.html" %}
 	{% endif %}
 {% endblock %}

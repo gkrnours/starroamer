@@ -44,8 +44,10 @@ db.close()
 @app.route('/', endpoint="index")
 @templated()
 def hello():
-    user = pickle.loads(session.get('user'))
-    return {'user': user}
+    if 'user' in session:
+        user = pickle.loads(session['user'])
+        return {'user': user}
+    return
     try:
         cred = SessionCredStorage().get()
         return {"auth": "ok"}
