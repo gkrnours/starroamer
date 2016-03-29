@@ -44,15 +44,20 @@ db.close()
 @app.route('/', endpoint="index")
 @templated()
 def hello():
+    try:
+        cred = SessionCredStorage().get()
+        return redirect(url_for("user.home"))
+    except TypeError:
+        pass
     if 'user' in session:
         user = pickle.loads(session['user'])
         return {'user': user}
     return
-    try:
-        cred = SessionCredStorage().get()
-        return {"auth": "ok"}
-    except TypeError:
-        pass
+
+@app.route('/user/', endpoint="user.home")
+@templated()
+def user_home():
+    pass
 
 @app.route('/sys/system')
 def system():

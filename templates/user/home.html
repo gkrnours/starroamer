@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block main %}
+	<div class=col-md-4>
+	{% if quicktrip %}
+	{% else %}
+		<p>No saved quicktrip</p>
+	{% endif %}
+	</div>
+{% endblock %}
