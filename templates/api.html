@@ -30,6 +30,7 @@
 			data = $(evt.target).serializeArray()[0]
 			$.ajax('/api/get', {data: {path: data['value']}})
 			.done(function(rep, ok) {
+				console.log("Response")
 				console.log(rep)
 				if(ok) {
 					if (300 <= rep['header'].status) {
@@ -134,6 +135,7 @@
 	function printError(header, content) {
 		$("#output").html("")
 		printHeader(header)
+		$("#output")
 			.append($("<h3>").text(content.key))
 			.append($("<p>").text(content.message))
 	}
