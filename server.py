@@ -59,6 +59,22 @@ def hello():
 def user_home():
     pass
 
+@app.route('/user/plan', endpoint="user.plan")
+@templated()
+def user_plan():
+    pass
+
+@app.route('/user/trip', endpoint="user.trip")
+@templated()
+def user_trip():
+    pass
+
+@app.route('/user/fit', endpoint="user.fit")
+@templated()
+def user_fit():
+    pass
+
+
 @app.route('/sys/system')
 def system():
     db  = sqlite3.connect("starroamer.db")
@@ -128,11 +144,6 @@ def auth_back():
     session['user'] = pickle.dumps(User.from_json(content))
     # Back home
     return redirect(url_for("index"))
-
-@app.route('/plan')
-@templated()
-def plan():
-    pass
 
 
 if __name__ == "__main__":

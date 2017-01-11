@@ -1,10 +1,44 @@
 {% extends "layout.html" %}
 
 {% block main %}
+
 	<div class=col-md-4>
 	{% if quicktrip %}
 	{% else %}
 		<p>No saved quicktrip</p>
 	{% endif %}
 	</div>
+
+	<div class=col-md-8>
+
+		<div class="card">
+			<div class=card-block>
+				<h4 class="card-title m-b-0">Planing</h4>
+			</div>
+			<img src="{{ url_for('static', filename='img/banner/route.jpg') }}"
+				alt="A route through new eden">
+			<div class=card-block>
+				<div class=text-md-right>
+				<a href="{{ url_for('user.plan') }}"
+					class="btn btn-secondary">Plan your route</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class=card-block>
+				<h4 class="card-title m-b-0">Fit</h4>
+			</div>
+			<img src="{{ url_for('static', filename='img/banner/fit.jpg') }}"
+				alt="Part of a Chimera blueprint">
+			<div class=card-block>
+				<div class=text-md-right>
+				<a href="{{ url_for('user.fit') }}"
+					class="btn btn-secondary">Save a new fit</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
 {% endblock %}

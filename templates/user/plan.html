@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block main %}
+	<div class=row>
+		<div class=col-md-4 id=path>
+		<ul class=list-group>
+			<li class=list-group-item>Destination
+			<li class=list-group-item>Fitting
+			<li class=list-group-item>Confirm
+		</ul>
+		</div>
+
+		<div class=col-md-8>
+		<form>
+			<h3>Flight Planner</h3>
+
+			<fieldset class=form-group>
+				<label for=path>Destination System</label>
+				<input type=text class=form-control id=dest name=destination>
+			</fieldset>
+
+			<button type=submit class="btn btn-outline-primary">Submit</button>
+		</form>
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block script %}
+<script>
+	URL_PREFIX = "https://crest-tq.eveonline.com"
+
+	$(document).ready(function() {
+		$.ajax('/api/get', {data: {path: data['value']}})
+		.done(function(rep, ok) {
+		})
+	})
+
+</script>
+{% endblock %}
