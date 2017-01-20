@@ -1,48 +1,26 @@
 from __future__ import print_function
 import sys
-from os import environ as nv
 
-no_tranquility = False
-no_singularity = False
+with open("secret.py") as f:
+    c = compile(f.read(), "secret.py", "exec")
+data = {}
+exec(c, {}, data)
 
-try:
-    eve_client_id = nv['EVE_CLIENT_ID']
-    eve_client_secret = nv['EVE_CLIENT_SECRET']
-except KeyError as e:
-    no_tranquility = True
-try:
-    test_client_id = nv['TEST_CLIENT_ID']
-    test_client_secret = nv['TEST_CLIENT_SECRET']
-except KeyError as e:
-    no_singularity = True
-
-if no_tranquility and no_singularity:
-    print("Missing env variable.", file=sys.stderr)
-    print("Require EVE_CLIENT_{ID,SECRET} or TEST_CLIENT_{ID,SECRET}",
+if data["client_id"] == "secret" and data["secret_key"] == "terces":
+    print("Did you updated secret.py with your application settings ?",
         file=sys.stderr)
+    print("See https://developers.eveonline.com", file=sys.stderr)
     exit(1)
 
-if not no_tranquility:
-    tranquility = {}
-    tranquility['auth'] = {
-        "client_id": eve_client_id,
-        "client_secret": eve_client_secret
-    }
-    tranquility['client'] = {
+tranquility = {
+    "auth": {
+        "client_id": data["client_id"],
+        "client_secret": data["secret_key"],
+    },
+    "client": {
         "auth_uri": "https://login.eveonline.com/oauth/authorize",
         "token_uri": "https://login.eveonline.com/oauth/token",
         "redirect_uri": "https://starroamer.mattic.org/auth",
-    }
-
-if not no_singularity:
-    singularity = {}
-    singularity['auth'] = {
-        "client_id": test_client_id,
-        "client_secret": test_client_secret
-    }
-    singularity['client'] = {
-        "auth_uri": "https://sisilogin.testeveonline.com/oauth/authorize",
-        "token_uri": "https://sisilogin.testeveonline.com/oauth/token",
-        "redirect_uri": "https://starroamer.mattic.org/auth",
-    }
+    },
+}
 

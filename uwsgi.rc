@@ -1,0 +1,23 @@
+#!/bin/sh
+# uwsgi daemon for casting
+
+HOMEDIR="/home/starroamer"
+VARDIR="/var/www/run/starroamer"
+
+daemon_controller=$VARDIR/uwsgi.ctrl
+
+daemon=$HOMEDIR/nv/bin/uwsgi
+daemon_flags="--ini $HOMEDIR/uwsgi.ini"
+daemon_user=root
+pexp=uwsgi
+
+. /etc/rc.d/rc.subr
+
+
+rc_reload=NO
+
+rc_stop() {
+	echo q > ${daemon_controller}
+}
+
+rc_cmd $1
