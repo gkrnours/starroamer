@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import json
+import logging
 import pickle
 import sqlite3
+import sys
 
 from flask import Flask
 from flask import abort, jsonify, redirect, session, url_for
@@ -16,8 +18,13 @@ from user import User
 from utils import templated, SessionCredStorage
 
 app = Flask(__name__)
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 app.secret_key = 'DEV_SECRET_KEY'
+
+handler = logging.FileHandler("/var/www/run/starroamer/flask.log")
+handler.setLevel(logging.INFO)
+app.logger.addHandler(handler)
+app.logger.info("Startup")
 
 ROOT_URL = "https://crest-tq.eveonline.com"
 
@@ -41,7 +48,18 @@ for A, B, name, dist in jumps:
     universe.add_edge(A, B, name=name, dist=dist)
 db.close()
 
-@app.route('/', endpoint="index")
+@app.errorhandler(400)
+def handle_bad_request(e):
+    app.logger.error(e)
+    return "Error 400"
+
+@app.errorhandler(500)
+def handle_bad_request(e):
+    app.logger.error(e)
+    return "Error 500"
+
+
+@app.route('/', endpoint="index", strict_slashes=False)
 @templated()
 def hello():
     try:
@@ -141,7 +159,7 @@ def auth_back():
     http = httplib2.Http()
     http = cred.authorize(http)
     (header, content) = http.request("%s" % (path), "GET")
-    session['user'] = pickle.dumps(User.from_json(content))
+    session['user'] = pickle.dumps(User.from_json(content.decode()))
     # Back home
     return redirect(url_for("index"))
 
